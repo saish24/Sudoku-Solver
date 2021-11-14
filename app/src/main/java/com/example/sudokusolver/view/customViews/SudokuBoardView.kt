@@ -1,4 +1,4 @@
-package com.example.sudokusolver
+package com.example.sudokusolver.view.customViews
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import kotlin.math.min
 
 class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(context, attributeSet){
@@ -19,6 +20,7 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
     private var selectedRow = -1
     private var selectedCol = -1
 
+    private var listener : onTouchListener? = null
 
     private val selectedCellPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
@@ -79,8 +81,7 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
                 else -> thinLinePaint
             }
             canvas.drawLine(i * cellSizePixels, 0f, i * cellSizePixels, height.toFloat(), currPaint)
-            canvas.drawLine(0f, i * cellSizePixels, width.toFloat(), i * cellSizePixels, currPaint)
-
+            canvas.drawLine(0f, i * cellSizePixels, width.toFloat(), i * cellSizePixels,  currPaint)
         }
     }
 
@@ -95,8 +96,22 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
     }
 
     private fun handleTouchEvent(x : Float, y : Float) {
-        selectedRow = (y / cellSizePixels).toInt()
-        selectedCol = (x / cellSizePixels).toInt()
+        val nextselectedRow = (y / cellSizePixels).toInt()
+        val nextselectedCol = (x / cellSizePixels).toInt()
+        listener?.onTouch(nextselectedRow, nextselectedCol)
+    }
+
+    fun updateSelectedCellUI(i : Int, j : Int) {
+        selectedRow = i
+        selectedCol = j
         invalidate()
+    }
+
+    interface onTouchListener {
+        fun onTouch(i : Int, j : Int)
+    }
+
+    fun setListener(listener: onTouchListener) {
+        this.listener = listener
     }
 }

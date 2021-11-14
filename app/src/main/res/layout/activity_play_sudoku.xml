@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlaySudokuActivity">
+    tools:context=".view.PlaySudokuActivity">
 
-    <com.example.sudokusolver.SudokuBoardView
+    <com.example.sudokusolver.view.customViews.SudokuBoardView
+        android:id="@+id/sudokuBoardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="8dp"

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SudokuSolver">
         <activity
-            android:name=".PlaySudokuActivity"
+            android:name=".view.PlaySudokuActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
