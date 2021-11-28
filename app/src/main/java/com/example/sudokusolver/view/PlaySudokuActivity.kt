@@ -6,11 +6,12 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.sudokusolver.R
+import com.example.sudokusolver.gameLogic.Cell
 import com.example.sudokusolver.view.customViews.SudokuBoardView
 import com.example.sudokusolver.viewModel.PlaySudokuViewModel
 import kotlinx.android.synthetic.main.activity_play_sudoku.*
 
-class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.onTouchListener {
+class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.OnTouchListener {
     private lateinit var playSudokuViewModel: PlaySudokuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,17 @@ class PlaySudokuActivity : AppCompatActivity(), SudokuBoardView.onTouchListener 
 
         playSudokuViewModel = ViewModelProviders.of(this).get(PlaySudokuViewModel::class.java)
         playSudokuViewModel.sudokuGame.selectedLiveData.observe(this, Observer { updateSelectedCell(it) })
+        playSudokuViewModel.sudokuGame.cellsLiveData.observe(this, { updateCells(it) })
+
+        val buttonList = listOf(button1, button2, button3, button4, button5, button6, button7, button8, button9)
+
+        buttonList.forEachIndexed { index, button ->
+            button.setOnClickListener { playSudokuViewModel.sudokuGame.handleInput(index+1) }
+        }
+    }
+
+    private fun updateCells(cells: List<Cell>) {
+        sudokuBoardView.updateCells(cells)
     }
 
     private fun updateSelectedCell(cell : Pair<Int, Int> ?) = cell?.let {

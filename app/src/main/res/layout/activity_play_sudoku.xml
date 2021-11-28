@@ -120,5 +120,8 @@
                 android:padding="30dp"
                 android:text="9" />
         </TableRow>
+        <TableRow android:gravity="end" >
+            <Button android:text="RESTART"/>
+        </TableRow>
     </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

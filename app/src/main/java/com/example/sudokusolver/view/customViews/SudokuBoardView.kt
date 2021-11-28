@@ -1,13 +1,12 @@
 package com.example.sudokusolver.view.customViews
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.example.sudokusolver.gameLogic.Cell
 import kotlin.math.min
 
 class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(context, attributeSet){
@@ -20,7 +19,9 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
     private var selectedRow = -1
     private var selectedCol = -1
 
-    private var listener : onTouchListener? = null
+    private var listener : OnTouchListener? = null
+
+    private var cells : List<Cell>? = null
 
     private val selectedCellPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
@@ -44,6 +45,19 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
         strokeWidth = 1.5f
     }
 
+    private val textPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.BLACK
+        textSize = 45F
+    }
+
+    private val boldTextPaint = Paint().apply {
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.BLACK
+        textSize = 50F
+        typeface = Typeface.DEFAULT_BOLD
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val sqSize = min(widthMeasureSpec, heightMeasureSpec)
@@ -51,19 +65,20 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
     }
 
     override fun onDraw(canvas: Canvas) {
-        cellSizePixels = (1f * width / size).toFloat()
+        cellSizePixels = (1f * width / size)
         fillCells(canvas)
         drawGrid(canvas)
+        drawText(canvas)
     }
 
     private fun fillCells(canvas: Canvas) {
-        if(selectedRow == -1) return
-        for (i in 0..size)
-        for (j in 0..size)
-        {
+
+        cells?.forEach {
+            val i = it.row
+            val j = it.col
             if(selectedRow == i && selectedCol == j) fillCell(canvas, i, j, selectedCellPaint)
             else if(selectedRow == i || selectedCol == j ||
-                   (i / sqSize == selectedRow / sqSize && j / sqSize == selectedCol / sqSize))
+                (i / sqSize == selectedRow / sqSize && j / sqSize == selectedCol / sqSize))
                 fillCell(canvas, i, j, sameRegionCellPaint)
         }
     }
@@ -82,6 +97,22 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
             }
             canvas.drawLine(i * cellSizePixels, 0f, i * cellSizePixels, height.toFloat(), currPaint)
             canvas.drawLine(0f, i * cellSizePixels, width.toFloat(), i * cellSizePixels,  currPaint)
+        }
+    }
+
+    private fun drawText(canvas: Canvas) {
+        cells?.forEach {
+            val valString: String = it.value.toString()
+            val paint = if (it.isStarting) boldTextPaint else textPaint;
+
+            val textBounds = Rect()
+            paint.getTextBounds(valString, 0, valString.length, textBounds)
+            val textWidth = paint.measureText(valString)
+            val textHeight = textBounds.height()
+            canvas.drawText(valString,
+                (it.col * cellSizePixels) + (cellSizePixels / 2f) - (textWidth / 2f),
+                (it.row * cellSizePixels) + (cellSizePixels / 2f) + (textHeight / 2f),
+                paint);
         }
     }
 
@@ -107,11 +138,16 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
         invalidate()
     }
 
-    interface onTouchListener {
+    fun updateCells(cells : List<Cell>) {
+        this.cells = cells
+        invalidate()
+    }
+
+    interface OnTouchListener {
         fun onTouch(i : Int, j : Int)
     }
 
-    fun setListener(listener: onTouchListener) {
+    fun setListener(listener: OnTouchListener) {
         this.listener = listener
     }
 }
