@@ -4,8 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidProjects/SudokuSolver2/app/src/main/res/drawable/tv_border.xml" value="0.30416666666666664" />
-        <entry key="..\:/AndroidProjects/SudokuSolver2/app/src/main/res/layout/activity_play_sudoku.xml" value="0.264" />
+        <entry key="..\:/AndroidProjects/SudokuSolver2/app/src/main/res/layout/activity_play_sudoku.xml" value="0.4" />
         <entry key="..\:/AndroidProjects/SudokuSolver2/app/src/main/res/layout/tv_border.xml" value="0.17753623188405798" />
+        <entry key="..\:/AndroidProjects/SudokuSolver2/app/src/main/res/menu/menu_sudoku.xml" value="0.2" />
       </map>
     </option>
   </component>

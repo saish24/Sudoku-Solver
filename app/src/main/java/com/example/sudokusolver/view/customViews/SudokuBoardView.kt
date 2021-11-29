@@ -77,8 +77,8 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
             val i = it.row
             val j = it.col
             if(selectedRow == i && selectedCol == j) fillCell(canvas, i, j, selectedCellPaint)
-            else if(selectedRow == i || selectedCol == j ||
-                (i / sqSize == selectedRow / sqSize && j / sqSize == selectedCol / sqSize))
+            else if(selectedRow != -1 && (selectedRow == i || selectedCol == j ||
+                (i / sqSize == selectedRow / sqSize && j / sqSize == selectedCol / sqSize)))
                 fillCell(canvas, i, j, sameRegionCellPaint)
         }
     }
@@ -102,17 +102,20 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
 
     private fun drawText(canvas: Canvas) {
         cells?.forEach {
-            val valString: String = it.value.toString()
-            val paint = if (it.isStarting) boldTextPaint else textPaint;
+            if(it.value != 0)
+            {
+                val valString: String = it.value.toString()
+                val paint = if (it.isStarting) boldTextPaint else textPaint;
 
-            val textBounds = Rect()
-            paint.getTextBounds(valString, 0, valString.length, textBounds)
-            val textWidth = paint.measureText(valString)
-            val textHeight = textBounds.height()
-            canvas.drawText(valString,
-                (it.col * cellSizePixels) + (cellSizePixels / 2f) - (textWidth / 2f),
-                (it.row * cellSizePixels) + (cellSizePixels / 2f) + (textHeight / 2f),
-                paint);
+                val textBounds = Rect()
+                paint.getTextBounds(valString, 0, valString.length, textBounds)
+                val textWidth = paint.measureText(valString)
+                val textHeight = textBounds.height()
+                canvas.drawText(valString,
+                    (it.col * cellSizePixels) + (cellSizePixels / 2f) - (textWidth / 2f),
+                    (it.row * cellSizePixels) + (cellSizePixels / 2f) + (textHeight / 2f),
+                    paint);
+            }
         }
     }
 
@@ -145,6 +148,7 @@ class SudokuBoardView (context: Context, attributeSet: AttributeSet) : View(cont
 
     interface OnTouchListener {
         fun onTouch(i : Int, j : Int)
+        fun disableCells(listCells: List<Int>)
     }
 
     fun setListener(listener: OnTouchListener) {
