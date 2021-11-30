@@ -6,10 +6,13 @@ import androidx.lifecycle.MutableLiveData
 class SudokuGame {
 
     var selectedLiveData = MutableLiveData<Pair<Int, Int>>()
-    var cellsLiveData = MutableLiveData<List<Cell>>();
-    var disableCellLiveData = MutableLiveData<List<Int>>();
+    var cellsLiveData = MutableLiveData<List<Cell>>()
+    var disableCellLiveData = MutableLiveData<List<Int>>()
+    var changeDifficultyLiveData = MutableLiveData<Int>()
 
-    var difficulty = Game.EASY
+    var easy = 0
+    var medium = 0
+    var hard = 0
 
     private val ideal = 1022 // 2^1 + 2^2 + ... + 2^9 = (2^10 - 1) - (2^0) = 1022
 
@@ -20,35 +23,43 @@ class SudokuGame {
     private var selectedRow = -1
     private var selectedCol = -1
 
-    private val board : Board
+    private val board : Board = Board(9, MutableList<Cell>(81) {Cell(it/9, it%9, 0, false)})
 
-    init {
-        val cells = MutableList(81) {Cell(it/9, it%9, 0, false)}
-        board = Board(9, cells)
+    private val easyGames : List<List<Int>> = listOf(
+        listOf(0, 1, 0, 0, 0, 0, 0, 8, 9, 0, 0, 5, 1, 0, 0, 6, 0, 0, 9, 0, 6, 4, 0, 3, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 9, 0, 0, 0, 0, 8, 3, 6, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1, 0, 0, 0, 8, 0, 6, 0, 2, 7, 0, 4, 0, 0, 7, 0, 0, 4, 2, 0, 0, 2, 4, 0, 0, 0, 0, 0, 6, 0),
+        listOf(0, 0, 0, 0, 8, 5, 0, 3, 6, 7, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 2, 0, 5, 0, 8, 0, 0, 0, 5, 0, 1, 0, 0, 6, 0, 3, 7, 2, 0, 0, 0, 9, 1, 0, 2, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 0, 6, 0, 0, 8, 0, 0, 9, 0, 3, 0, 0, 0, 7, 4, 0, 0, 9, 0, 0, 0, 6, 0),
+        listOf(0, 0, 8, 0, 0, 3, 2, 0, 5, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 7, 0, 6, 0, 0, 0, 4, 0, 0, 5, 4, 0, 0, 9, 0, 3, 0, 2, 8, 0, 0, 0, 0, 7, 0, 6, 0, 9, 0, 7, 0, 1, 0, 0, 0, 0, 0, 6, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 3, 0, 0, 0, 9, 1, 0, 0, 2, 7, 0, 5, 0, 0),
+        listOf(9, 0, 0, 3, 0, 0, 0, 0, 7, 0, 7, 6, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 8, 0, 0, 3, 0, 9, 0, 0, 0, 0, 0, 9, 5, 0, 4, 2, 0, 8, 1, 0, 0, 2, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 0, 6, 7, 4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 3, 5, 8, 0, 0, 0, 7, 2, 1, 0),
+        listOf(0, 0, 0, 0, 1, 8, 0, 0, 5, 3, 2, 0, 0, 0, 0, 0, 7, 0, 4, 0, 0, 7, 0, 0, 0, 6, 3, 8, 1, 0, 4, 0, 5, 0, 0, 2, 6, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 7, 1, 9, 0, 0, 0, 0, 0, 0, 9, 2, 0, 6, 0, 1, 0, 0, 0, 0, 0, 4, 0, 9, 0, 8, 5, 4, 0, 0, 3, 0, 0, 0, 0)
+    )
+    private val medGames : List<List<Int>> = listOf(
+        listOf(8, 0, 6, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 5, 9, 0, 0, 0, 5, 0, 9, 0, 0, 8, 0, 0, 0, 0, 0, 3, 0, 0, 6, 7, 0, 9, 4, 0, 0, 0, 9, 0, 0, 0, 6, 0, 0, 0, 0, 3, 7, 2, 0, 4, 0, 4, 0, 7, 8, 0, 0, 6, 0, 0, 6, 5, 0, 0, 0, 0, 4, 1, 0, 0, 2, 0, 0, 0, 0, 0, 7),
+        listOf(0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 7, 8, 0, 0, 0, 0, 5, 0, 0, 0, 4, 2, 0, 0, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 2, 0, 0, 7, 0, 8, 6, 0, 0, 0, 0, 0, 0, 4, 0, 0, 1, 6, 9, 5, 7, 0, 0, 0, 9, 3, 0, 8, 0, 1, 0, 0, 0, 0, 4, 7, 0, 0, 6),
+        listOf(0, 0, 0, 1, 0, 0, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 7, 0, 0, 2, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 3, 0, 0, 2, 8, 0, 4, 0, 0, 0, 9, 7, 6, 1, 0, 2, 0, 5, 4, 3, 1, 0, 0, 0, 0, 0, 2, 6, 0, 0, 9, 2, 0, 8, 0, 3, 9, 0, 2, 7, 0, 0, 0, 0, 0),
+        listOf(2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 0, 0, 0, 6, 8, 0, 6, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 0, 0, 9, 7, 3, 1, 2, 4, 5, 0, 0, 2, 0, 0, 7, 0, 9, 0, 0, 0, 8, 0, 0, 0, 6, 3, 0, 5, 9, 0, 0, 0, 3, 0, 8, 0, 2),
+        listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 7, 2, 0, 0, 0, 0, 0, 0, 7, 5, 0, 6, 0, 0, 5, 6, 3, 0, 9, 1, 0, 0, 0, 0, 0, 6, 1, 0, 0, 0, 5, 6, 2, 1, 0, 9, 0, 7, 8, 0, 8, 0, 0, 0, 2, 1, 5, 9, 0, 0, 7, 0, 8, 3, 6, 4, 1, 0)
+    )
+    private val hardGames : List<List<Int>> = listOf(
+        listOf(0, 0, 0, 0, 0, 0, 6, 0, 0, 2, 3, 0, 0, 6, 0, 0, 0, 9, 5, 6, 8, 0, 0, 9, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 8, 0, 7, 0, 0, 1, 0, 0, 9, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 7, 5, 9, 0, 4, 0, 0, 0, 8, 9, 0, 0, 5, 0, 7, 6, 4),
+        listOf(0, 0, 4, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 5, 0, 9, 0, 0, 9, 0, 5, 0, 0, 0, 0, 0, 0, 0, 3, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 5, 0, 2, 0, 0, 0, 0, 0, 0, 9, 0, 0, 7, 3, 1, 4, 5, 0),
+        listOf(9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 5, 0, 0, 5, 0, 4, 0, 6, 9, 0, 3, 0, 6, 7, 0, 0, 0, 5, 8, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 9, 0, 2, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3, 5, 0, 4),
+        listOf(0, 6, 0, 0, 0, 3, 0, 5, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 5, 6, 0, 0, 3, 0, 0, 3, 0, 0, 0, 6, 9, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 7, 3, 0, 0, 0, 0, 5, 0, 0, 2, 0, 0, 0, 0, 0, 0, 6, 0, 0, 7, 1, 0, 0, 3, 0, 0, 0, 0, 8, 0, 0, 0, 1, 6),
+        listOf(0, 0, 0, 0, 2, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 1, 0, 3, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 9, 6, 0, 0, 0, 0, 3, 5, 0, 0, 0, 7, 8, 0, 0, 0, 0, 0, 0, 0, 9, 0, 3, 0, 2, 1, 9, 0, 0, 6, 0, 5, 0, 7, 3)
+    )
 
-        difficulty = Game.EASY
-
-        // make above array with a network call to bring in sudoku puzzle
-
-        cells.forEach {
-//            Log.d("SUDOKU", "$filter")
-
-            if(it.isStarting && it.value != 0)
-                setBits(it.row, it.col, it.value)
-        }
-
-        disableCellLiveData.postValue(emptyList())
-        cellsLiveData.postValue(board.cells)
-    }
+    init { changeDifficulty(1) }
 
     fun handleInput(num : Int) {
         if(selectedCol == -1 ||
            selectedRow == -1 ||
-           board.cells[selectedRow * 9 + selectedCol].isStarting) return;
+           board.cells[selectedRow * 9 + selectedCol].isStarting) return
 
+        unSetBits(selectedRow, selectedCol, board.cells[selectedRow * 9 + selectedCol].value)
         setBits(selectedRow, selectedCol, num)
+
         board.getCell(selectedRow, selectedCol).value = num
 
+        disableCellLiveData.postValue(putDisabled(selectedRow, selectedCol))
         cellsLiveData.postValue(board.cells)
     }
 
@@ -71,7 +82,7 @@ class SudokuGame {
 
         for (x in  1..9)
         {
-            if(((1 shl(x)) and possible) != 0) res.add(x)
+            if(((1 shl x) and possible) != 0) res.add(x)
         }
 
         return res
@@ -90,7 +101,7 @@ class SudokuGame {
                         if(mask != 0) {
                             board.cells[i*9 + j].value = x
                             setBits(i, j, x)
-//                            cellsLiveData.postValue(board.cells)
+                            cellsLiveData.postValue(board.cells)
 
                             if(recurse()) return true
                             unSetBits(i, j, x)
@@ -116,6 +127,7 @@ class SudokuGame {
         if(selectedRow != -1 && selectedCol != -1) {
             unSetBits(selectedRow, selectedCol, board.getCell(selectedRow, selectedCol).value)
             board.getCell(selectedRow, selectedCol).value = 0
+            disableCellLiveData.postValue(putDisabled(selectedRow, selectedCol))
             cellsLiveData.postValue(board.cells)
         }
     }
@@ -150,9 +162,44 @@ class SudokuGame {
             }
         }
 
-        // TODO : correct this error! ⚠
-        disableCellLiveData.postValue(emptyList())
+        disableCellLiveData.postValue(listOf(1,2,3,4,5,6,7,8,9))
+        selectedLiveData.postValue(Pair(-1, -1))
+        cellsLiveData.postValue(board.cells)
+    }
 
+    fun changeDifficulty(j : Int) {
+        var i = 0
+        when(j) {
+            1 -> {
+                easy = (easy + 1) % easyGames.size
+                board.cells.forEach {
+                    unSetBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                    it.value = easyGames[easy][i++]
+                    it.isStarting = it.value > 0
+                    setBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                }
+            }
+            2 -> {
+                medium = (medium + 1) % medGames.size
+                board.cells.forEach {
+                    unSetBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                    it.value = medGames[medium][i++]
+                    it.isStarting = it.value > 0
+                    setBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                }
+            }
+            3 -> {
+                hard = (hard + 1) % hardGames.size
+                board.cells.forEach {
+                    unSetBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                    it.value = hardGames[hard][i++]
+                    it.isStarting = it.value > 0
+                    setBits(it.row, it.col, board.getCell(it.row, it.col).value)
+                }
+            }
+        }
+
+        selectedLiveData.postValue(Pair(-1, -1))
         cellsLiveData.postValue(board.cells)
     }
 }
