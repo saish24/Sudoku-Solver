@@ -7,4 +7,9 @@
         android:icon="@drawable/ic_refresh"
         android:title="refresh"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/mi_highscore"
+        android:icon="@drawable/ic_winner"
+        android:title="Highscore"
+        app:showAsAction="always" />
 </menu>
