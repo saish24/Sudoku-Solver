@@ -39,7 +39,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="7" />
+                android:text="@string/_7"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button8"
@@ -48,7 +50,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="8" />
+                android:text="@string/_8"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button9"
@@ -57,7 +61,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="9" />
+                android:text="@string/_9"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
         </TableRow>
 
         <TableRow
@@ -71,7 +77,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="4" />
+                android:text="@string/_4"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button5"
@@ -80,7 +88,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="5" />
+                android:text="@string/_5"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button6"
@@ -89,7 +99,9 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="6" />
+                android:text="@string/_6"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
         </TableRow>
 
@@ -104,25 +116,31 @@
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="1" />
+                android:text="@string/_1"
+                tools:ignore="TextContrastCheck"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/button2"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="2" />
+                android:text="@string/_2"
+                tools:ignore="TextContrastCheck" />
 
             <Button
                 android:id="@+id/button3"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:backgroundTint="@color/teal_700"
                 android:padding="30dp"
-                android:text="3" />
+                android:text="@string/_3"
+                tools:ignore="TextContrastCheck" />
         </TableRow>
 
         <TableRow>
@@ -130,16 +148,18 @@
             <Button
                 android:id="@+id/clear"
                 android:layout_margin="5dp"
-                android:text="CLEAR" />
+                android:text="@string/clear"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:visibility="invisible"
-                />
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/solve"
                 android:layout_margin="5dp"
-                android:text="SOLVE" />
+                android:text="@string/solve"
+                style="?android:attr/buttonBarButtonStyle" />
         </TableRow>
     </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
